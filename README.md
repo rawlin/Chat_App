@@ -1,2 +1,2 @@
 # Chat App
-Messaging App powered by Firebase Messaging 
+Messaging App powered by Firebase 
