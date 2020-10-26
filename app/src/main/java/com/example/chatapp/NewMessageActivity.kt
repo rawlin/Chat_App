@@ -3,6 +3,7 @@ package com.example.chatapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -34,6 +35,7 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     private fun fetchUsers() {
+        val currentuser= FirebaseAuth.getInstance().currentUser?.uid
         val ref=FirebaseDatabase.getInstance().getReference("/users")
         ref.addValueEventListener(object:ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -41,8 +43,11 @@ class NewMessageActivity : AppCompatActivity() {
                 snapshot.children.forEach{
                     Timber.d(it.toString())
                     val user=it.getValue(User::class.java)
+
                     if(user!=null){
-                       adapter.add(UserItem(user))
+                        if(user.uid!=currentuser){
+                            adapter.add(UserItem(user))
+                        }
                     }
                 }
                 adapter.setOnItemClickListener { item, view ->

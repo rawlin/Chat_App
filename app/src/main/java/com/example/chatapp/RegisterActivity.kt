@@ -52,6 +52,11 @@ class RegisterActivity : AppCompatActivity() {
             intent.type="image/*"
             startActivityForResult(intent,0)
         }
+
+        already_have_account_text_view.setOnClickListener {
+            val intent=Intent(this,LoginActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun uploadImageToFirebase() {
@@ -93,8 +98,10 @@ class RegisterActivity : AppCompatActivity() {
             Timber.d("Photo was selected")
             selectedPhotoUri=data.data
             val bitmap= MediaStore.Images.Media.getBitmap(contentResolver,selectedPhotoUri)
-            val bitmapDrawable=BitmapDrawable(bitmap)
-            selectphoto_button.setBackgroundDrawable(bitmapDrawable)
+            selectphoto_imageview.setImageBitmap(bitmap)
+            selectphoto_button.alpha=0f
+//            val bitmapDrawable=BitmapDrawable(bitmap)
+//            selectphoto_button.setBackgroundDrawable(bitmapDrawable)
         }
     }
 }

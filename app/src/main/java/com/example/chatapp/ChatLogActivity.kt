@@ -14,7 +14,7 @@ import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import kotlinx.android.synthetic.main.chat_from_row.view.*
 import kotlinx.android.synthetic.main.chat_to_row.view.*
-import kotlinx.android.synthetic.main.chat_to_row.view.textview_to_row
+import kotlinx.android.synthetic.main.chat_to_row.view.back_to_register_textview
 import timber.log.Timber
 
 class ChatLogActivity : AppCompatActivity() {
@@ -27,10 +27,11 @@ class ChatLogActivity : AppCompatActivity() {
         //val username=intent.getStringExtra(NewMessageActivity.USER_KEY)
         val toUser=intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
         supportActionBar?.title=toUser?.username
+        recyclerview_chat_log.adapter=adapter
 
         listenForMessages()
 
-        recyclerview_chat_log.adapter=adapter
+
 
         send_button_chat_log.setOnClickListener {
             Timber.d("Attempting to Send message")
@@ -49,10 +50,10 @@ class ChatLogActivity : AppCompatActivity() {
                 Timber.d(chatMessage?.text)
                 if(chatMessage!=null){
                     if(chatMessage.fromID==FirebaseAuth.getInstance().uid){
-                        val curretnUser=LatestMessagesActivity.currentUser ?:return
-                        adapter.add(ChatFromItem(chatMessage.text,curretnUser))
+                        val currentUser=LatestMessagesActivity.currentUser
+                        adapter.add(ChatToItem(chatMessage.text,currentUser!!))
                     }else{
-                        adapter.add(ChatToItem(chatMessage.text,toUser!!))
+                        adapter.add(ChatFromItem(chatMessage.text,toUser!!))
                     }
 
                 }
@@ -61,19 +62,19 @@ class ChatLogActivity : AppCompatActivity() {
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                //Nothing to add
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
+                //Nothing to add
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                //Nothing to add
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                //Nothing to add
             }
         })
     }
@@ -83,7 +84,7 @@ class ChatLogActivity : AppCompatActivity() {
     }
 
     private fun performSendMessage() {
-        val text=edittest_chat_log.text.toString()
+        val text=edittext_chat_log.text.toString()
         val fromID=FirebaseAuth.getInstance().uid
         val user=intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
         val toID=user?.uid
@@ -93,7 +94,7 @@ class ChatLogActivity : AppCompatActivity() {
         reference.setValue(chatMessage)
             .addOnSuccessListener {
                 Timber.d("Saved Message ${reference.key}")
-                edittest_chat_log.text.clear()
+                edittext_chat_log.text.clear()
                 recyclerview_chat_log.scrollToPosition(adapter.itemCount-1)
             }
         toReference.setValue(chatMessage)
@@ -120,7 +121,7 @@ class ChatFromItem(val text:String,val user:User): Item<ViewHolder>(){
 
 class ChatToItem(val text:String,val user:User): Item<ViewHolder>(){
     override fun bind(viewHolder: ViewHolder, position: Int) {
-        viewHolder.itemView.textview_to_row.text=text
+        viewHolder.itemView.back_to_register_textview.text=text
         val uri=user.profileImageUrl
         val targetImageView=viewHolder.itemView.imageview_to_row
         Picasso.get().load(uri).into(targetImageView)
